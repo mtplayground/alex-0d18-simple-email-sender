@@ -2,6 +2,7 @@ import express from "express";
 import { existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { isEmailServiceConfigured } from "./emailProvider.js";
 
 const app = express();
 const port = Number.parseInt(process.env.PORT ?? "8080", 10);
@@ -14,7 +15,10 @@ app.disable("x-powered-by");
 app.use(express.json({ limit: "32kb" }));
 
 app.get("/api/health", (_req, res) => {
-  res.status(200).json({ ok: true });
+  res.status(200).json({
+    ok: true,
+    emailService: isEmailServiceConfigured() ? "configured" : "not_configured"
+  });
 });
 
 if (existsSync(clientDir)) {
