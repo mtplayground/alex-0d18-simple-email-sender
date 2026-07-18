@@ -71,7 +71,9 @@ export const handleJsonParseError: ErrorRequestHandler = (
   } satisfies SendEmailResponse);
 };
 
-function validateSendEmailRequest(body: unknown): ValidatedSendEmailRequest {
+export function validateSendEmailRequest(
+  body: unknown
+): ValidatedSendEmailRequest {
   if (typeof body !== "object" || body === null) {
     return { ok: false, error: "Enter a recipient, subject, and message." };
   }

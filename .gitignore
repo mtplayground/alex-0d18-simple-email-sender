@@ -1,5 +1,6 @@
 target/
 dist/
+dist-test/
 node_modules/
 .gh_token
 .database_url
