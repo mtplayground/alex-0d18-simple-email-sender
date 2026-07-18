@@ -1,8 +1,7 @@
-import { FormEvent, useMemo, useState } from "react";
-import type {
-  SendEmailRequest,
-  SendEmailResponse
-} from "../shared/email";
+import type { FormEvent } from "react";
+import { useMemo, useState } from "react";
+import type { SendEmailRequest } from "../shared/email";
+import { sendEmailDraft } from "./sendEmail";
 
 type SendState =
   | { status: "idle" }
@@ -43,19 +42,12 @@ export function App() {
     setSendState({ status: "sending" });
 
     try {
-      const response = await fetch("/api/send-email", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(draft)
-      });
-      const result = (await response.json()) as SendEmailResponse;
+      const result = await sendEmailDraft(draft);
 
-      if (!response.ok || !result.ok) {
+      if (!result.ok) {
         setSendState({
           status: "error",
-          message: result.ok ? "The email could not be sent." : result.error
+          message: result.error
         });
         return;
       }
@@ -82,7 +74,11 @@ export function App() {
           </p>
         </div>
 
-        <form className="email-form" onSubmit={handleSubmit}>
+        <form
+          aria-busy={sendState.status === "sending"}
+          className="email-form"
+          onSubmit={handleSubmit}
+        >
           <label className="field">
             <span>Recipient</span>
             <input
