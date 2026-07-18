@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { createServer, type IncomingMessage } from "node:http";
-import { AddressInfo } from "node:net";
+import type { AddressInfo } from "node:net";
 import { resolve } from "node:path";
 import { after, before, describe, it } from "node:test";
 import { createApp } from "../src/server/app.js";
@@ -57,7 +57,20 @@ describe("email send flow", () => {
     const html = await response.text();
 
     assert.equal(response.status, 200);
+    assert.equal(response.headers.get("cache-control"), "no-store");
+    assert.equal(response.headers.get("x-content-type-options"), "nosniff");
+    assert.equal(response.headers.get("x-frame-options"), "DENY");
     assert.match(html, /<div id="root"><\/div>/);
+  });
+
+  it("reports readiness when email delivery is configured", async () => {
+    const response = await fetch(`${appUrl}/api/ready`);
+
+    assert.equal(response.status, 200);
+    assert.deepEqual(await response.json(), {
+      ok: true,
+      emailService: "configured"
+    });
   });
 
   it("sends a form draft through the configured email service", async () => {
