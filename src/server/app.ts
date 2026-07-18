@@ -1,6 +1,6 @@
 import express from "express";
 import { existsSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { dirname, join, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { isEmailServiceConfigured } from "./emailProvider.js";
 import { handleJsonParseError, sendEmailHandler } from "./sendEndpoint.js";
@@ -17,6 +17,7 @@ export function createApp(options: CreateAppOptions = {}) {
 
   app.set("trust proxy", 1);
   app.disable("x-powered-by");
+  app.use(applyProductionHeaders);
   app.use(express.json({ limit: "32kb" }));
   app.use(handleJsonParseError);
 
@@ -27,10 +28,31 @@ export function createApp(options: CreateAppOptions = {}) {
     });
   });
 
+  app.get("/api/ready", (_req, res) => {
+    const ready = isEmailServiceConfigured();
+
+    res.status(ready ? 200 : 503).json({
+      ok: ready,
+      emailService: ready ? "configured" : "not_configured"
+    });
+  });
+
   app.post("/api/send-email", sendEmailHandler);
 
   if (existsSync(clientDir)) {
-    app.use(express.static(clientDir, { index: false }));
+    app.use(
+      express.static(clientDir, {
+        index: false,
+        setHeaders(res, path) {
+          if (path.includes(`${sep}assets${sep}`)) {
+            res.setHeader(
+              "Cache-Control",
+              "public, max-age=31536000, immutable"
+            );
+          }
+        }
+      })
+    );
   }
 
   app.get("*", (req, res) => {
@@ -44,8 +66,38 @@ export function createApp(options: CreateAppOptions = {}) {
       return;
     }
 
+    res.setHeader("Cache-Control", "no-store");
     res.sendFile(indexFile);
   });
 
   return app;
+}
+
+function applyProductionHeaders(
+  _req: express.Request,
+  res: express.Response,
+  next: express.NextFunction
+) {
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "DENY");
+  res.setHeader("Referrer-Policy", "no-referrer");
+  res.setHeader(
+    "Permissions-Policy",
+    "camera=(), microphone=(), geolocation=()"
+  );
+  res.setHeader(
+    "Content-Security-Policy",
+    [
+      "default-src 'self'",
+      "base-uri 'self'",
+      "connect-src 'self'",
+      "form-action 'none'",
+      "frame-ancestors 'none'",
+      "img-src 'self' data:",
+      "object-src 'none'",
+      "script-src 'self'",
+      "style-src 'self'"
+    ].join("; ")
+  );
+  next();
 }
