@@ -1,0 +1,52 @@
+# Architecture Plan
+
+Product scope from issues: a minimal one-page web app with recipient, subject,
+and message fields that sends an email when the user clicks Send, with no login
+and no database.
+
+## Module Structure
+
+- `src/` or framework-equivalent app entry: owns the one-page UI and any
+  routing needed to serve it.
+- `src/components/EmailForm.*`: recipient, subject, and message inputs, submit
+  button, loading state, validation messages, success/error feedback.
+- `src/shared/email.*`: shared request/response shapes and validation rules for
+  recipient email, subject, and message. Keep these reusable by both UI and API
+  tests.
+- `src/server/emailProvider.*`: email-service adapter. Reads provider API key,
+  sender address, and provider-specific settings from environment variables.
+- `src/server/routes/send.*`: `POST /api/send` endpoint. Parses JSON, validates
+  input, calls the provider adapter, and returns small JSON responses.
+- `tests/unit/`: validation and provider/route unit tests with provider calls
+  mocked.
+- `tests/e2e/`: browser-level send-flow test using a mocked or test-mode email
+  provider so CI does not send real mail.
+- Deployment/config files: added only when the go-live issue selects the final
+  runtime and hosting details.
+
+## Issue Dependencies
+
+1. Issue #1 initializes the project structure and chooses the concrete stack.
+2. Issue #2 adds the email-provider adapter and environment contract.
+3. Issue #3 builds the one-page email form using shared validation types.
+4. Issue #4 adds the send endpoint and connects it to the provider adapter.
+5. Issue #5 wires the form submission to `POST /api/send` and handles states.
+6. Issue #6 adds focused unit tests for validation, provider behavior, and the
+   endpoint contract.
+7. Issue #7 adds an end-to-end send-flow test using mocked/test email delivery.
+8. Issue #8 finalizes production build, runtime env documentation, health/check
+   behavior if needed, and deployment readiness.
+
+## Key Design Decisions
+
+- Keep the product intentionally small: one page, one API endpoint, no auth, no
+  persistence, no background queue.
+- Centralize validation so the UI, endpoint, and tests share the same rules.
+- Never expose email provider credentials to the browser; only the server route
+  talks to the provider.
+- Return generic provider failure messages to users while logging enough server
+  detail for diagnosis.
+- Derive public origin from proxy-aware headers or platform-provided config if
+  any origin checks are introduced later.
+- Prefer a stack with first-class full-stack support for static UI plus one
+  server endpoint; the final stack choice belongs in Issue #1.
