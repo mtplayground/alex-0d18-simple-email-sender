@@ -2,34 +2,36 @@
 
 ## Product Scope
 
-The app is an existing minimal single-page email sender. The only remaining
-work item is issue #17: replace the flat page background with the specified
-layered, colorful gradient while keeping the email form readable and its layout
-unchanged.
+The app is a single-page email sender. Issue #19 makes its background much
+more vivid and guarantees the color treatment fills the entire browser
+viewport, including areas outside the page content.
 
 ## Module Structure
 
-- `src/client/App.tsx`: one-page email sender UI and form state.
-- `src/client/styles.css`: global visual system, responsive layout, form
-  contrast, and the page-level gradient background for issue #17.
-- `src/client/sendEmail.ts`: browser client for the same-origin send endpoint.
-- `src/shared/email.ts`: request and response types shared by client/server.
-- `src/server/`: Express app, send route, and server-side email service adapter.
-- `tests/`: validation, email adapter, and end-to-end send-flow coverage.
+- `src/client/App.tsx`: email composer markup and client-side form state.
+- `src/client/styles.css`: global canvas, responsive layout, component styling,
+  and the full-page layered gradient for issue #19.
+- `src/client/main.tsx`: client bootstrap and stylesheet import.
+- `src/client/sendEmail.ts`: same-origin send endpoint client.
+- `src/shared/email.ts`: request and response types shared with the server.
+- `src/server/`: Express app, send route, and email provider adapter.
+- `tests/`: endpoint, provider, and end-to-end send-flow coverage.
 
 ## Issue Dependencies
 
-1. Issue #17 depends on the existing page shell and stylesheet only.
-2. It does not change the send endpoint, email provider integration, auth,
-   persistence, shared DTOs, or tests.
+1. Issue #19 depends only on the existing client stylesheet and root page
+   structure.
+2. It has no dependencies on email delivery, shared types, persistence, or
+   server configuration.
 
 ## Key Design Decisions
 
-- Implement the background as layered CSS gradients on the root/page surface:
-  soft red and purple radial glows over a 135-degree yellow-to-aqua-to-lavender
-  linear gradient.
-- Preserve the existing dark global text color and Inter-based font stack.
-- Leave the white form surface, input backgrounds, button colors, and status
-  colors intact so controls remain legible against the new background.
-- Keep the change stylesheet-only and avoid altering layout or application
-  behavior.
+- Apply the background to the actual document canvas (`html`, `body`, and app
+  root sizing) rather than relying solely on `:root`, so it remains visible
+  across the full viewport and during content overflow.
+- Use a high-saturation base gradient with multiple radial color blooms for a
+  visibly colorful result at common desktop and mobile aspect ratios.
+- Keep the composer and form surfaces sufficiently opaque and preserve dark
+  foreground colors to protect contrast and usability.
+- Keep the implementation CSS-only; no changes are needed to form behavior,
+  API contracts, or server code.

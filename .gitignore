@@ -1,7 +1,10 @@
+# Build outputs and dependencies
 target/
 dist/
 dist-test/
 node_modules/
+
+# Workspace and platform credentials/state
 .gh_token
 .database_url
 .task_id
