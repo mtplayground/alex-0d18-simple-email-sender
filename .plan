@@ -2,15 +2,15 @@
 
 ## Product Scope
 
-The app is a single-page email sender. Issue #19 makes its background much
-more vivid and guarantees the color treatment fills the entire browser
-viewport, including areas outside the page content.
+The app is a single-page email sender. Issue #21 changes the existing page
+background to blue while preserving the current form layout, text contrast,
+and email-sending behavior.
 
 ## Module Structure
 
 - `src/client/App.tsx`: email composer markup and client-side form state.
 - `src/client/styles.css`: global canvas, responsive layout, component styling,
-  and the full-page layered gradient for issue #19.
+  and the full-page blue background treatment for issue #21.
 - `src/client/main.tsx`: client bootstrap and stylesheet import.
 - `src/client/sendEmail.ts`: same-origin send endpoint client.
 - `src/shared/email.ts`: request and response types shared with the server.
@@ -19,18 +19,17 @@ viewport, including areas outside the page content.
 
 ## Issue Dependencies
 
-1. Issue #19 depends only on the existing client stylesheet and root page
+1. Issue #21 depends only on the existing client stylesheet and root page
    structure.
 2. It has no dependencies on email delivery, shared types, persistence, or
    server configuration.
 
 ## Key Design Decisions
 
-- Apply the background to the actual document canvas (`html`, `body`, and app
-  root sizing) rather than relying solely on `:root`, so it remains visible
+- Apply the blue background to the document canvas so it remains visible
   across the full viewport and during content overflow.
-- Use a high-saturation base gradient with multiple radial color blooms for a
-  visibly colorful result at common desktop and mobile aspect ratios.
+- Keep the change CSS-only and retain readable dark foregrounds plus the
+  existing opaque form surface for contrast on the blue page background.
 - Keep the composer and form surfaces sufficiently opaque and preserve dark
   foreground colors to protect contrast and usability.
 - Keep the implementation CSS-only; no changes are needed to form behavior,
