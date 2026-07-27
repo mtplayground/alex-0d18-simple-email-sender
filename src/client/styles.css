@@ -23,18 +23,24 @@ body {
   min-height: 100vh;
   background:
     radial-gradient(
-      circle at 12% 16%,
-      rgb(147 197 253 / 55%) 0%,
-      rgb(147 197 253 / 32%) 16%,
-      transparent 35%
+      circle at 10% 14%,
+      rgb(251 146 60 / 62%) 0%,
+      rgb(251 191 36 / 36%) 20%,
+      transparent 40%
     ),
     radial-gradient(
-      circle at 88% 14%,
-      rgb(96 165 250 / 45%) 0%,
-      rgb(96 165 250 / 26%) 18%,
-      transparent 38%
+      circle at 90% 12%,
+      rgb(236 72 153 / 56%) 0%,
+      rgb(196 181 253 / 34%) 21%,
+      transparent 42%
     ),
-    linear-gradient(135deg, #dbeafe 0%, #93c5fd 50%, #2563eb 100%);
+    radial-gradient(
+      circle at 76% 88%,
+      rgb(45 212 191 / 48%) 0%,
+      rgb(134 239 172 / 28%) 22%,
+      transparent 44%
+    ),
+    linear-gradient(135deg, #fff7b8 0%, #ffd6bd 42%, #d8c7ff 100%);
   background-attachment: fixed;
 }
 
