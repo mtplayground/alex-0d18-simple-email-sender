@@ -2,35 +2,39 @@
 
 ## Product Scope
 
-The app is a single-page email sender. Issue #21 changes the existing page
-background to blue while preserving the current form layout, text contrast,
-and email-sending behavior.
+The product is the existing single-page **Simple email sender**. Issues #23
+and #24 progressively evolve only its page background: #23 restores a bright
+multi-color treatment, then #24 intensifies it into an even brighter rainbow
+palette. The email composition and delivery flow remain unchanged.
 
 ## Module Structure
 
-- `src/client/App.tsx`: email composer markup and client-side form state.
-- `src/client/styles.css`: global canvas, responsive layout, component styling,
-  and the full-page blue background treatment for issue #21.
-- `src/client/main.tsx`: client bootstrap and stylesheet import.
-- `src/client/sendEmail.ts`: same-origin send endpoint client.
-- `src/shared/email.ts`: request and response types shared with the server.
-- `src/server/`: Express app, send route, and email provider adapter.
-- `tests/`: endpoint, provider, and end-to-end send-flow coverage.
+- `src/client/App.tsx`: email-composer markup, client-side form state, and send
+  feedback; no background-specific logic is required.
+- `src/client/styles.css`: document canvas styling and responsive component
+  styles. It owns the reusable page-background gradient stack and will contain
+  both visual changes.
+- `src/client/main.tsx`: client bootstrap and global stylesheet import.
+- `src/client/sendEmail.ts` and `src/shared/email.ts`: existing browser/server
+  email contract; outside the scope of both background issues.
+- `src/server/` and `tests/`: delivery implementation and coverage; unchanged
+  unless visual tooling is added in a later task.
 
 ## Issue Dependencies
 
-1. Issue #21 depends only on the existing client stylesheet and root page
-   structure.
-2. It has no dependencies on email delivery, shared types, persistence, or
-   server configuration.
+1. Issue #23 establishes the bright multi-color background foundation in
+   `src/client/styles.css`, replacing the current blue-only canvas treatment.
+2. Issue #24 depends on the palette structure introduced by #23 and adjusts
+   the same CSS gradient stops, saturation, and luminance to make the result a
+   visibly brighter rainbow without altering layout or functionality.
 
 ## Key Design Decisions
 
-- Apply the blue background to the document canvas so it remains visible
-  across the full viewport and during content overflow.
-- Keep the change CSS-only and retain readable dark foregrounds plus the
-  existing opaque form surface for contrast on the blue page background.
-- Keep the composer and form surfaces sufficiently opaque and preserve dark
-  foreground colors to protect contrast and usability.
-- Keep the implementation CSS-only; no changes are needed to form behavior,
-  API contracts, or server code.
+- Keep both changes CSS-only on `body`, using layered fixed gradients so the
+  background covers the full viewport and remains stable during page overflow.
+- Use a small, coherent rainbow palette with adequate brightness while keeping
+  the existing opaque white form surface and dark copy for readable content.
+- Do not introduce new shared types, dependencies, API changes, or server-side
+  behavior for visual-only work.
+- Preserve the same selector and gradient-stack structure across the two
+  issues so #24 is a focused palette refinement rather than a redesign.
